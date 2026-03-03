@@ -116,6 +116,15 @@ public class LibroResumenService
                 endpoint,
                 payload
             );
+
+            // Si el SII devuelve 400, típicamente significa que ese mes no hay facturas de ese tipoDoc (ej: 61 no tiene nada).
+            // En vez de lanzar un error y romper Latenode, devolvemos un JSON vacío amigable.
+            if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                string emptyJson = "{\"metaData\":{},\"data\":[]}";
+                return JsonSerializer.Deserialize<JsonElement>(emptyJson);
+            }
+
             response.EnsureSuccessStatusCode();
 
             string raw = await response.Content.ReadAsStringAsync();
