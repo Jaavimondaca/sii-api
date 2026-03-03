@@ -105,7 +105,8 @@ public class LibroResumenService
                     Operacion = operacion.ToUpperInvariant(),
                     EstadoContab = estado,
                     CodTipoDoc = tipoDoc,
-                    TokenRecaptcha = "0"
+                    TokenRecaptcha = "0",
+                    AccionRecaptcha = "0"
                 },
             };
 
