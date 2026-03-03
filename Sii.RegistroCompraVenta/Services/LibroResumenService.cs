@@ -76,20 +76,21 @@ public class LibroResumenService
     {
         try
         {
+            string opUpper = operacion.ToUpperInvariant();
             string siiToken = await _authenticator.AutenticarAsync(UrlAuth);
             HttpClient client = _httpClientFactory.CreateClient(_clientName);
             (string rut, string dv) = ParseRut(rutEmisor);
             // Default condition: REGISTRO
             string estado = "REGISTRO";
 
-            string endpoint = operacion == "VENTA" 
+            string endpoint = opUpper == "VENTA" 
                 ? "consdcvinternetui/services/data/facadeService/getDetalleVenta" 
                 : "consdcvinternetui/services/data/facadeService/getDetalleCompra";
-            string ns = operacion == "VENTA"
+            string ns = opUpper == "VENTA"
                 ? "cl.sii.sdi.lob.diii.consdcv.data.api.interfaces.FacadeService/getDetalleVenta"
                 : "cl.sii.sdi.lob.diii.consdcv.data.api.interfaces.FacadeService/getDetalleCompra";
 
-            string accionRe = operacion == "VENTA" ? "RCV_DETV" : "RCV_DETC";
+            string accionRe = opUpper == "VENTA" ? "RCV_DETV" : "RCV_DETC";
 
             object payload = new
             {
@@ -104,7 +105,7 @@ public class LibroResumenService
                     RutEmisor = rut,
                     DvEmisor = dv,
                     Ptributario = periodo.ToString("yyyyMM", new CultureInfo("es-CL")),
-                    Operacion = operacion.ToUpperInvariant(),
+                    Operacion = opUpper,
                     EstadoContab = estado,
                     CodTipoDoc = tipoDoc,
                     TokenRecaptcha = "0",
