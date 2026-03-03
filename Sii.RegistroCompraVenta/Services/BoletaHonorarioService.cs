@@ -150,8 +150,9 @@ public class BoletaHonorarioService
         }
 
         // Devolver un objeto similar al que bota el SII de Compras/Ventas: {"metaData": {}, "data": [...]}
+        // Para modo debug: Si la lista está vacía, retornar el HTML en metadata para ver qué llegó
         var wrapper = new {
-            metaData = new { },
+            metaData = facturasList.Count == 0 ? new { rawHtmlDebug = html } : new object(),
             data = facturasList
         };
 
