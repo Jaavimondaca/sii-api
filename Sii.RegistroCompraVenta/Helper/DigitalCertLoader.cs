@@ -26,6 +26,9 @@ public class DigitalCertLoader
             CookieContainer cookieContainer = new();
             HttpClientHandler handler = new() { CookieContainer = cookieContainer };
             handler.ClientCertificates.Add(cert);
+            
+            // Bypass SSL certificate errors for zeus.sii.cl legacy servers
+            handler.ServerCertificateCustomValidationCallback = (sender, certificate, chain, sslPolicyErrors) => true;
             return handler;
         }
         catch (Exception)

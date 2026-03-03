@@ -46,8 +46,8 @@ public class BoletaHonorarioService
             });
 
             // Analizando la captura original y el payload, el endpoint exacto para boletas históricas
-            // enviando datos form-urlencoded a una página clásica suele ser este CGI en `zeus` o `zeusr`
-            string urlReal = "https://zeus.sii.cl/rtc/RTC/TMBCOC_InformeMensual.cgi";
+            // enviando datos form-urlencoded a una página clásica es en el subdominio LOA.
+            string urlReal = "https://loa.sii.cl/cgi_IMT/TMBCOC_InformeMensualBheRec.cgi";
             
             HttpResponseMessage response = await client.PostAsync(urlReal, formContent);
             
