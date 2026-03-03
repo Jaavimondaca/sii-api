@@ -50,16 +50,19 @@ public class BoletaHonorarioService
             string urlReal = "https://loa.sii.cl/cgi_IMT/TMBCOC_InformeMensualBheRec.cgi";
             
             // ATENCIÓN: El error "I082:host no definido" ocurre porque a estos CGI legacy
-            // les falta el Referer, el Origin o un User-Agent de navegador normal.
-            // Además, arrojaba 302 Found redireccionando al login, lo que significa
-            // que el CGI Legacy de ZEUS/LOA necesita que le enviemos explícitamente la Cookie TOKEN.
+            // les falta el Host exacto, el Referer, Origin o un User-Agent de navegador normal.
             var requestMensaje = new HttpRequestMessage(HttpMethod.Post, urlReal)
             {
-                Content = formContent
+                Content = new StringContent(
+                    $"rut_arrastre={rut}&dv_arrastre={dv}&pagina_solicitada=0&cbmesinformemensual={mes}&cbanoinformemensual={ano}", 
+                    System.Text.Encoding.UTF8, 
+                    "application/x-www-form-urlencoded"
+                )
             };
+            requestMensaje.Headers.Add("Host", "loa.sii.cl");
             requestMensaje.Headers.Add("Referer", "https://loa.sii.cl/");
             requestMensaje.Headers.Add("Origin", "https://loa.sii.cl");
-            requestMensaje.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+            requestMensaje.Headers.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
             requestMensaje.Headers.Add("Cookie", $"TOKEN={siiToken}");
 
             HttpResponseMessage response = await client.SendAsync(requestMensaje);
