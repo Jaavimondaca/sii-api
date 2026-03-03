@@ -45,9 +45,11 @@ public class BoletaHonorarioService
                 new KeyValuePair<string, string>("cbanoinformemensual", ano)
             });
 
-            // 3. Enviar el POST a la URL de consulta de boletas
-            string endpoint = "boletahonorariosui/services/data/facadeService/getConsultaBoletasRecibidasMensual";
-            HttpResponseMessage response = await client.PostAsync(endpoint, formContent);
+            // Analizando la captura original y el payload, el endpoint exacto para boletas históricas
+            // enviando datos form-urlencoded a una página clásica suele ser este CGI en `zeus` o `zeusr`
+            string urlReal = "https://zeus.sii.cl/rtc/RTC/TMBCOC_InformeMensual.cgi";
+            
+            HttpResponseMessage response = await client.PostAsync(urlReal, formContent);
             
             response.EnsureSuccessStatusCode();
 
