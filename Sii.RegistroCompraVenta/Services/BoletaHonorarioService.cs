@@ -49,7 +49,17 @@ public class BoletaHonorarioService
             // enviando datos form-urlencoded a una página clásica es en el subdominio LOA.
             string urlReal = "https://loa.sii.cl/cgi_IMT/TMBCOC_InformeMensualBheRec.cgi";
             
-            HttpResponseMessage response = await client.PostAsync(urlReal, formContent);
+            // ATENCIÓN: El error "I082:host no definido" ocurre porque a estos CGI legacy
+            // les falta el Referer, el Origin o un User-Agent de navegador normal.
+            var requestMensaje = new HttpRequestMessage(HttpMethod.Post, urlReal)
+            {
+                Content = formContent
+            };
+            requestMensaje.Headers.Add("Referer", "https://loa.sii.cl/");
+            requestMensaje.Headers.Add("Origin", "https://loa.sii.cl");
+            requestMensaje.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36");
+
+            HttpResponseMessage response = await client.SendAsync(requestMensaje);
             
             response.EnsureSuccessStatusCode();
 
