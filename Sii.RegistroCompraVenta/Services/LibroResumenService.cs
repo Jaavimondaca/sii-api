@@ -104,7 +104,8 @@ public class LibroResumenService
                     Ptributario = periodo.ToString("yyyyMM", new CultureInfo("es-CL")),
                     Operacion = operacion.ToUpperInvariant(),
                     EstadoContab = estado,
-                    CodTipoDoc = tipoDoc
+                    CodTipoDoc = tipoDoc,
+                    TokenRecaptcha = "0"
                 },
             };
 
