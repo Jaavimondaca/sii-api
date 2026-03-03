@@ -4,6 +4,7 @@ using Sii.RegistroCompraVenta.Services;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<SiiAuthenticator>();
 builder.Services.AddSingleton<LibroResumenService>();
+builder.Services.AddSingleton<BoletaHonorarioService>();
 
 builder
     .Services.AddHttpClient(
