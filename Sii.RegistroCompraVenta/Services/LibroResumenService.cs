@@ -89,6 +89,8 @@ public class LibroResumenService
                 ? "cl.sii.sdi.lob.diii.consdcv.data.api.interfaces.FacadeService/getDetalleVenta"
                 : "cl.sii.sdi.lob.diii.consdcv.data.api.interfaces.FacadeService/getDetalleCompra";
 
+            string accionRe = operacion == "VENTA" ? "RCV_DETV" : "RCV_DETC";
+
             object payload = new
             {
                 metaData = new
@@ -106,7 +108,7 @@ public class LibroResumenService
                     EstadoContab = estado,
                     CodTipoDoc = tipoDoc,
                     TokenRecaptcha = "0",
-                    AccionRecaptcha = "0"
+                    AccionRecaptcha = accionRe
                 },
             };
 
