@@ -35,7 +35,9 @@ public class BoletaHonorarioService
             string mes = periodo.ToString("MM");
             string ano = periodo.ToString("yyyy");
 
-            // 2. Armar el Form-Data clásico que capturamos de la pestaña Network
+            // Armar el Form-Data clásico que capturamos de la pestaña Network
+            // Usamos FormUrlEncodedContent puro. Evitamos StringContent porque .NET
+            // le hace append silencioso a "; charset=utf-8", lo que crashea el viejo CGI del SII (I082).
             var formContent = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("rut_arrastre", rut),
@@ -45,24 +47,18 @@ public class BoletaHonorarioService
                 new KeyValuePair<string, string>("cbanoinformemensual", ano)
             });
 
-            // Analizando la captura original y el payload, el endpoint exacto para boletas históricas
-            // enviando datos form-urlencoded a una página clásica es en el subdominio LOA.
             string urlReal = "https://loa.sii.cl/cgi_IMT/TMBCOC_InformeMensualBheRec.cgi";
             
-            // ATENCIÓN: El error "I082:host no definido" ocurre porque a estos CGI legacy
-            // les falta el Host exacto, el Referer, Origin o un User-Agent de navegador normal.
             var requestMensaje = new HttpRequestMessage(HttpMethod.Post, urlReal)
             {
-                Content = new StringContent(
-                    $"rut_arrastre={rut}&dv_arrastre={dv}&pagina_solicitada=0&cbmesinformemensual={mes}&cbanoinformemensual={ano}", 
-                    System.Text.Encoding.UTF8, 
-                    "application/x-www-form-urlencoded"
-                )
+                Content = formContent
             };
-            requestMensaje.Headers.Add("Host", "loa.sii.cl");
+            
+            // NO se debe añadir "Host" manualmente con requestMensaje.Headers.Add porque .NET lo duplica
+            // y causa que los firewalls antiguos del SII devuelvan el error "I082:host no definido".
             requestMensaje.Headers.Add("Referer", "https://loa.sii.cl/");
             requestMensaje.Headers.Add("Origin", "https://loa.sii.cl");
-            requestMensaje.Headers.Add("User-Agent", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36");
+            requestMensaje.Headers.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36");
             requestMensaje.Headers.Add("Cookie", $"TOKEN={siiToken}");
 
             HttpResponseMessage response = await client.SendAsync(requestMensaje);
