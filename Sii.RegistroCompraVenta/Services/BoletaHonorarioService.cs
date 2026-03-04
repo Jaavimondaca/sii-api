@@ -35,9 +35,6 @@ public class BoletaHonorarioService
             string mes = periodo.ToString("MM");
             string ano = periodo.ToString("yyyy");
 
-            // Armar el Form-Data clásico que capturamos de la pestaña Network
-            // Usamos FormUrlEncodedContent puro. Evitamos StringContent porque .NET
-            // le hace append silencioso a "; charset=utf-8", lo que crashea el viejo CGI del SII (I082).
             var formContent = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("rut_arrastre", rut),
@@ -46,13 +43,20 @@ public class BoletaHonorarioService
                 new KeyValuePair<string, string>("cbmesinformemensual", mes),
                 new KeyValuePair<string, string>("cbanoinformemensual", ano)
             });
+            
+            // ELIMINAR el charset que molesta al servidor prehistórico del SII (Apache 1.2)
+            formContent.Headers.ContentType!.CharSet = string.Empty;
 
             string urlReal = "https://loa.sii.cl/cgi_IMT/TMBCOC_InformeMensualBheRec.cgi";
             
             var requestMensaje = new HttpRequestMessage(HttpMethod.Post, urlReal)
             {
-                Content = formContent
+                Content = formContent,
+                Version = new Version(1, 1) // El SII crashea duro con HTTP/2 o HTTP/3
             };
+            
+            // OJO: Evitar el Expect: 100-continue que rompe CGIs antiguos
+            requestMensaje.Headers.ExpectContinue = false;
             
             // NO se debe añadir "Host" manualmente con requestMensaje.Headers.Add porque .NET lo duplica
             // y causa que los firewalls antiguos del SII devuelvan el error "I082:host no definido".
